@@ -1,0 +1,9 @@
+{
+    "editor.indentSize": "tabSize",
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true,
+        "eslint.validate": [
+            "typescript"
+        ]
+    }
+}
