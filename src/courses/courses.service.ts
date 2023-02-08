@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { NotFoundException } from '@nestjs/common/exceptions';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -30,9 +30,13 @@ export class CourseService {
   }
 
   async create(createCourseDTO: CreateCourseDto) {
-    const tags = await Promise.all(
-      createCourseDTO.tags.map((name: string) => this.preloadTagByName(name)),
-    );
+    const tags = createCourseDTO.tags
+      ? await Promise.all(
+          createCourseDTO.tags.map((name: string) =>
+            this.preloadTagByName(name),
+          ),
+        )
+      : [];
 
     const course = this.courseRepository.create({ ...createCourseDTO, tags });
     return this.courseRepository.save(course);
@@ -46,7 +50,7 @@ export class CourseService {
       ));
 
     const course = await this.courseRepository.preload({
-      id: +id,
+      id: id,
       ...updateCourseDTO,
       tags,
     });
@@ -65,7 +69,7 @@ export class CourseService {
   }
 
   private async preloadTagByName(name: string): Promise<Tag> {
-    const tag = await this.tagRepository.findOne(name);
+    const tag = await this.tagRepository.findOne({ name });
 
     if (tag) {
       return tag;
